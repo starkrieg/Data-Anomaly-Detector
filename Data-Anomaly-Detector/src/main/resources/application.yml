@@ -1,0 +1,43 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+application:
+  queue:
+    name: ${INBOUND_QUEUE:inbound}
+    dataset-size: ${DATASET-SIZE:50} # between 50 and 100
+    anomaly-threshold: ${ANOMALY-THRESHOLD:3} # threshold to define a data point is an anomaly
+
+logging:
+  pattern:
+    # https://logging.apache.org/log4j/2.x/manual/pattern-layout.html
+    # use '%d{yyyy-MM-dd HH:mm:ss:ss.SSS}' to print timestamp of the log
+    # use '%-5level' to print log level
+    # use '${spring.application.name}' to print a config
+    # use '%thread' to print the thread identifier
+    # use '%C{2}' to print the callable class that printed the log
+    # use '%m' to print the message that was passed to the log, this includes exception messages
+    # use '%n' to make sure line breaks will only appear at the end of the line
+    console: "%-5level [%d{yyyy-MM-dd HH:mm:ss:ss.SSS}] %m%n"
+  level:
+    com:
+      application: "INFO"
+
+spring:
+  application:
+    name: "Data-Anomaly-Detector"
+  rabbitmq:
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
+    port: ${RABBITMQ_PORT:5672}
+    host: ${RABBITMQ_HOST:localhost}
+    listener:
+      simple:
+        retry:
+          enabled: false
+          initial-interval: 2000
+          multiplier: 1.5
+          max-interval: 10000
+          max-attempts: 3

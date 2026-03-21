@@ -1,0 +1,62 @@
+package com.application.consumer;
+
+import com.application.businessLogic.ZScoreAnomalyDetector;
+import com.application.businessLogic.interfaces.DataAnomalyDetector;
+import org.slf4j.Logger;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.amqp.autoconfigure.SimpleRabbitListenerContainerFactoryConfigurer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
+
+@Component
+public class RabbitMqConsumer {
+
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    private ApplicationConfig applicationConfig;
+
+    private final DataAnomalyDetector dataAnomalyDetector;
+
+    @Autowired
+    public RabbitMqConsumer(ApplicationConfig applicationConfig) {
+        applicationConfig.displayMessage();
+        dataAnomalyDetector = new ZScoreAnomalyDetector(applicationConfig.getDatasetSize()
+                , applicationConfig.getAnomalyThreshold());
+    }
+
+    @RabbitListener(queues = "${application.queue.name}")
+    public void handle(String message) {
+        try {
+            // Validate message input format
+
+            double dataPoint = Double.parseDouble(message);
+
+            dataAnomalyDetector.validateDataPoint(dataPoint);
+        } catch (NumberFormatException ex) {
+            logger.error("Could not treat consumed message as a numbered value with decimals.", ex);
+            if (logger.isTraceEnabled()) {
+                logger.trace(String.format("Consumed message is: %s", message));
+            }
+        }
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
+                                                                               SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        return factory;
+    }
+
+    @Bean
+    public Queue queue() {
+        return new Queue( applicationConfig.getName(), false, false, false);
+    }
+
+
+}

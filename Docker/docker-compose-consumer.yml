@@ -1,0 +1,27 @@
+
+# Run with
+# docker-compose -p data-anomaly-detector-all -f .\Docker\docker-compose-consumer.yml up -d
+
+networks:
+  data-anomaly:
+
+services:
+  data-anomaly-detector:
+    networks:
+      - data-anomaly
+    image: data-anomaly-detector:latest
+    restart: always
+    # expose the ports to connect from outside docker env
+    ports:
+      # outside:inside
+      - 3000:8080
+    environment:
+      INBOUND_QUEUE: "inbound"
+      DATASET-SIZE: 100
+      ANOMALY-THRESHOLD: 3
+      RABBITMQ_USER: "guest"
+      RABBITMQ_PASS: "guest"
+      RABBITMQ_PORT: 5672
+      RABBITMQ_HOST: # <rabbit URI>
+
+
