@@ -11,12 +11,15 @@ jobs:
   build:
     name: Gradle Build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Data-Anomaly-Detector
     steps:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v4
         with:
-          path: Data-Anomaly-Detector
+          path: ./Data-Anomaly-Detector
 
       - id: setup_java
         name: Setup Java 25
