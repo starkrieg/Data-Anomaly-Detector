@@ -28,6 +28,7 @@ jobs:
         name: Gradlew Permissions
         shell: bash
         run: |
+          cd ./Data-Anomaly-Detector
           chmod +x gradlew
 
       - id: gradlew_clean
