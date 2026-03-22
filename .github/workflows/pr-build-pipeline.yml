@@ -1,0 +1,58 @@
+name: PR Build Pipeline
+
+on:
+  pull_request:
+  commit:
+    branches:
+      - develop
+
+jobs:
+  build:
+    name: Gradle Build
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - id: setup_java
+        name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 25
+          overwrite-settings: false
+
+      - id: gradlew_permissions
+        name: Gradlew Permissions
+        shell: bash
+        run: |
+          chmox +x gradlew
+
+      - id: gradlew_clean
+        name: Gradle Clean
+        shell: bash
+        run: |
+          ./gradlew clean
+
+      - id: gradlew_assemble
+        name: Gradle Assemble
+        shell: bash
+        run: |
+          ./gradlew assemble
+
+      - id: gradlew_jar
+        name: Gradle Jar
+        shell: bash
+        continue-on-error: true
+        run: |
+          ./gradlew bootJar
+          
+      - id: gradlew_test
+        name: Gradle Test
+        shell: bash
+        run: |
+          ./gradlew test
+        
+      
+
