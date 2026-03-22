@@ -11,15 +11,10 @@ jobs:
   build:
     name: Gradle Build
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Data-Anomaly-Detector
     steps:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: ./Data-Anomaly-Detector
 
       - id: setup_java
         name: Setup Java 25
@@ -33,18 +28,21 @@ jobs:
         name: Gradlew Permissions
         shell: bash
         run: |
+          cd ./Data-Anomaly-Detector
           chmod +x gradlew
 
       - id: gradlew_clean
         name: Gradle Clean
         shell: bash
         run: |
+          cd ./Data-Anomaly-Detector
           ./gradlew clean
 
       - id: gradlew_assemble
         name: Gradle Assemble
         shell: bash
         run: |
+          cd ./Data-Anomaly-Detector
           ./gradlew assemble
 
       - id: gradlew_jar
@@ -52,12 +50,14 @@ jobs:
         shell: bash
         continue-on-error: true
         run: |
+          cd ./Data-Anomaly-Detector
           ./gradlew bootJar
 
       - id: gradlew_test
         name: Gradle Test
         shell: bash
         run: |
+          cd ./Data-Anomaly-Detector
           ./gradlew test
         
       
