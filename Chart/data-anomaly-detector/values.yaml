@@ -1,0 +1,20 @@
+# Default values for Data Anomaly Detector
+
+image: data-anomaly-detector:latest
+
+inbound_queue:  inbound
+dataset_size: 50
+anomaly_threshold: 3
+
+rabbitmq:
+  user: guest
+  pass: guest
+  host: 
+  port: 5672
+
+resources:
+  requests:
+    memory: 1024Mi
+    cpu: 500m
+  limits:
+    memory: 2048Mi

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: data-anomaly-detector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-anomaly-detector
+  template:
+    metadata:
+      labels:
+        app: data-anomaly-detector
+    spec:
+      containers:
+        - name: data-anomaly-detector
+          image: {{ required "image repository and tag must be set" $.Values.image }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            INBOUND_QUEUE: {{ required "Target queue for the consumer must be set" $.Values.inbound_queue }}
+            DATASET_SIZE: {{ $.Values.dataset_size }}
+            ANOMALY_THRESHOLD: {{ $.Values.anomaly_threshold }}
+            RABBITMQ_USER: {{ $.Values.rabbitmq.user }}
+            RABBITMQ_PASS: {{ $.Values.rabbitmq.pass }}
+            RABBITMQ_HOST: {{ required "RabbitMQ host address must be set" $.Values.rabbitmq.host }}
+            RABBITMQ_PORT: {{ $.Values.rabbitmq.port }}
+          startupProbe:
+            httpGet:
+              path: actuator/health
+              port: 8080
+          readinessProve:
+            httpGet:
+              path: actuator/health
+              port: 8080
+          livenessProbe:
+            httpGet:
+              path: actuator/health
+              port: 8080
+          resources:
+            {{ $.Values.resources | toYaml | nindent 6 }}

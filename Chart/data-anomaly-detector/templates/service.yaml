@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: anomaly-detector-service
+  labels:
+    app: data-anomaly-detector
+    app.kubernetes.io/managed-by: data-detector-service
+    app.kubernetes.io/instance: data-detector-service
+  spec:
+    selector:
+      app: data-anomaly-detector
+    ports:
+      - protocol: TCP
+        protocolName: http
+        port: 8080
+        targetPort: 8080
+
+
