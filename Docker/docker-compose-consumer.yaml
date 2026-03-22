@@ -10,6 +10,7 @@ services:
     networks:
       - data-anomaly
     image: data-anomaly-detector:latest
+    container_name: anomaly-detector
     restart: always
     # expose the ports to connect from outside docker env
     ports:

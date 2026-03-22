@@ -1,5 +1,5 @@
 # Run with
-# docker build -f ./Docker/DOCKERFILE -t data-anomaly-detector:latest .
+# docker build -f ./Docker/Dockerfile -t data-anomaly-detector:latest .
 
 # 21/March/2026
 # JRE 25 Patch 2

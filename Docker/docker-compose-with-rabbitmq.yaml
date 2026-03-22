@@ -9,6 +9,7 @@ services:
   rabbitmq:
     networks:
       - data-anomaly
+    container_name: rabbitmq
     # RabbitMQ
     # https://hub.docker.com/layers/library/rabbitmq/4.2.5-management-alpine/images/sha256-236bb5ddf99476e9856e3ecc157c81bc8666379c4bc85253af42996f0bae74e3
     image: rabbitmq:4.2.5-management-alpine@sha256:7983ce30209cb12a4423907cfafe9eebcfa3dfc8e7463a444b1070bf0f52851c
@@ -27,6 +28,7 @@ services:
     networks:
       - data-anomaly
     image: data-anomaly-detector:latest
+    container_name: anomaly-detector
     restart: always
     # expose the ports to connect from outside docker env
     ports:
@@ -40,6 +42,16 @@ services:
       RABBITMQ_PASS: "guest"
       RABBITMQ_PORT: 5672
       RABBITMQ_HOST: rabbitmq
-      # JAVA_TOOL_OPTIONS: ''
 
-
+  # Dozzle (https://dozzle.dev/) added to facilitate log monitoring of apps without needing Docker desktop
+  dozzle:
+    networks:
+      - data-anomaly
+    image: amir20/dozzle:v10.0.5
+    container_name: dozzle
+    restart: always
+    ports:
+      - 7010:8080
+    # make sure volume is readonly
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro

@@ -1,0 +1,23 @@
+# Run with
+# docker-compose -f .\Docker\compose.yaml up -d
+
+networks:
+  data-anomaly:
+
+data-producer:
+    networks:
+      - data-anomaly
+    image: data-producer-mock:latest
+    container_name: data-producer
+    depends_on:
+      - rabbitmq
+    # add args directly to command like here
+    # args are:
+    # --anomalyOdds ANOMALY_ODDS
+    # --targetQueue TARGET_QUEUE
+    # --messageDelay MESSAGE_DELAY
+    # --RabbitHost RABBITMQ_HOST
+    # --RabbitPort RABBITMQ_PORT
+    # --RabbitUsername RABBITMQ_USER
+    # --RabbitPassword RABBITMQ_PASS
+    command: "--RabbitHost rabbitmq"
