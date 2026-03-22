@@ -6,10 +6,16 @@
 # Minimal image for smaller size
 FROM eclipse-temurin:25.0.2_10-jre-ubi10-minimal@sha256:cf56857a708b374ecce43fac9d6049af0883fe50c829d81928381423dbe4b680
 
+# Copy the built jar to inside the container
 COPY ./build/libs/Data-Anomaly-Detector-0.0.1-SNAPSHOT.jar /usr/local/bin/Data-Anomaly-Detector.jar
 
+# Give the jar file permission to be executed
 RUN chmod +x /usr/local/bin/Data-Anomaly-Detector.jar
 
+# Expose the port for communication with the outside
 EXPOSE 8080
+
+# Use this CMD to have an image that does nothing so you can inspect the container while its running
+#CMD ["sleep", "infinity"]
 
 CMD ["java", "-jar", "/usr/local/bin/Data-Anomaly-Detector.jar", "$@"]

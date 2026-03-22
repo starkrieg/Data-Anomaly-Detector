@@ -1,6 +1,5 @@
-
 # Run with
-# docker-compose -p data-anomaly-detector-all -f .\Docker\docker-compose-consumer.yml up -d
+# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-consumer.yml up -d
 
 networks:
   data-anomaly:

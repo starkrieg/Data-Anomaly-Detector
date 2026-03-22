@@ -1,6 +1,6 @@
 
 # Run with
-# docker-compose -p data-anomaly-detector-all -f .\Docker\docker-compose-with-rabbitmq.yml up -d
+# docker-compose -p data-anomaly-detector-simple -f .\Docker\docker-compose-with-rabbitmq.yml up -d
 
 networks:
   data-anomaly:

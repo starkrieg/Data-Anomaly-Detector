@@ -8,17 +8,17 @@ import argparse
 parser = argparse.ArgumentParser()
 
 # The -- makes the argument into optional
-parser.add_argument("--anomalyOdds",
+parser.add_argument("--AnomalyOdds",
     help="A floating point number that determines how often a data anomaly will be sent by the Producer. Defaults to '0.05' or 5%",
     default='0.05', type=float)
 
 # The -- makes the argument into optional
-parser.add_argument("--messageDelay", 
+parser.add_argument("--MessageDelay", 
     help="A timer for delay between messages procudes. It's a floating point number that is read as delay in Seconds. Defaults to '0.5' or 500ms delay", 
     default='0.5', type=float)
 
 # The -- makes the argument into optional
-parser.add_argument("--targetQueue", 
+parser.add_argument("--TargetQueue", 
     help="The name of the target queue where the Producer will send the data points. Defaults to 'inbound'", 
     default='inbound', type=str)
 
@@ -45,10 +45,10 @@ parser.add_argument("--RabbitPassword",
 args = parser.parse_args()
 
 # lower this number to increase number of messages sent per second
-message_delay = args.messageDelay
+message_delay = args.MessageDelay
 
 # increase this number to increase anomalous data points
-odds_of_anomaly = args.anomalyOdds
+odds_of_anomaly = args.AnomalyOdds
 
 print("Starting Continuous Data Producer for RabbitMQ")
 print(f"Rabbit Host: {args.RabbitHost}")
@@ -60,7 +60,7 @@ print(f"Anomaly Odds: {args.anomalyOdds}")
 print(f"Message Delay: {args.messageDelay}")
 
 # Instance of the producer that will continuously send the data points
-producer = RabbitMqProducer(args.targetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)
+producer = RabbitMqProducer(args.TargetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)
 
 # Producer will run until the thread is killed
 ContinuousProducer.start(producer=producer, odds_of_anomaly=odds_of_anomaly, message_delay=message_delay)

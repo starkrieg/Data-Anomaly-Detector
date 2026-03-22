@@ -1,5 +1,5 @@
 # Run with
-# docker-compose -p data-anomaly-detector-all -f .\Docker\docker-compose-full-scenario.yaml up -d
+# docker-compose -p data-anomaly-detector-full -f .\Docker\docker-compose-full-scenario.yaml up -d
 
 networks:
   data-anomaly:

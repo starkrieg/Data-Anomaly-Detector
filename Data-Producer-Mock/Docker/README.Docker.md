@@ -1,7 +1,7 @@
 ### Building and running your application
 
 When you're ready, start your application by running:
-`docker compose up --build`.
+`docker-compose -f .\Docker\compose.yaml up -d`.
 
 This application does not expose ports.
 

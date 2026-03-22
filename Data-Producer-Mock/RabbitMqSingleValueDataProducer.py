@@ -7,7 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 
 # The -- makes the argument into optional
-parser.add_argument("--targetQueue", 
+parser.add_argument("--TargetQueue", 
     help="The name of the target queue where the Producer will send the data points. Defaults to 'inbound'", 
     default='inbound', type=str)
 
@@ -38,7 +38,7 @@ parser.add_argument("Value",
 
 args = parser.parse_args()
 
-producer = RabbitMqProducer(args.targetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)
+producer = RabbitMqProducer(args.TargetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)
 
 value = args.Value
 
