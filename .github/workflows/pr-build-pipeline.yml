@@ -1,6 +1,9 @@
 name: PR Build Pipeline
 
 on:
+  workflow_dispatch:
+
+on:
   pull_request:
     branches:
       - develop
