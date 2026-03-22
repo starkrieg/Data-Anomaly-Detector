@@ -15,6 +15,8 @@ jobs:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v4
+        with:
+          path: Data-Anomaly-Detector
 
       - id: setup_java
         name: Setup Java 25
@@ -28,7 +30,6 @@ jobs:
         name: Gradlew Permissions
         shell: bash
         run: |
-          cd ./Data-Anomaly-Detector
           chmod +x gradlew
 
       - id: gradlew_clean
