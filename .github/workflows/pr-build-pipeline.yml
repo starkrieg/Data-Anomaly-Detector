@@ -2,7 +2,6 @@ name: PR Build Pipeline
 
 on:
   pull_request:
-  commit:
     branches:
       - develop
 
@@ -47,7 +46,7 @@ jobs:
         continue-on-error: true
         run: |
           ./gradlew bootJar
-          
+
       - id: gradlew_test
         name: Gradle Test
         shell: bash
