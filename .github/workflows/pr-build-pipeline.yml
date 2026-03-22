@@ -28,7 +28,7 @@ jobs:
         name: Gradlew Permissions
         shell: bash
         run: |
-          chmox +x gradlew
+          chmod +x gradlew
 
       - id: gradlew_clean
         name: Gradle Clean
