@@ -1,7 +1,8 @@
 package com.application.consumer;
 
-import com.application.businessLogic.ZScoreAnomalyDetector;
-import com.application.businessLogic.interfaces.DataAnomalyDetector;
+import com.application.consumer.interfaces.Consumer;
+import com.application.detector.ZScoreAnomalyDetector;
+import com.application.detector.interfaces.DataAnomalyDetector;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RabbitMqConsumer {
+public class RabbitMqConsumer implements Consumer {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -24,11 +25,19 @@ public class RabbitMqConsumer {
 
     @Autowired
     public RabbitMqConsumer(ApplicationConfig applicationConfig) {
-        applicationConfig.displayMessage();
-        dataAnomalyDetector = new ZScoreAnomalyDetector(applicationConfig.getDatasetSize()
-                , applicationConfig.getAnomalyThreshold());
+        logger.info(applicationConfig.toString());
+        dataAnomalyDetector = new ZScoreAnomalyDetector(applicationConfig.getDatasetSize(),
+                applicationConfig.getAnomalyThreshold());
     }
 
+    /**
+     * Handle consumption of messages for a specific queue.
+     *
+     * Will validate the data point in the message using the anomaly detector
+     * defined at the creation of this consumer.
+     *
+     * @param message a string number with decimal value
+     */
     @RabbitListener(queues = "${application.queue.name}")
     public void handle(String message) {
         try {

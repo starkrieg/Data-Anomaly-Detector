@@ -1,11 +1,14 @@
-package com.application.businessLogic;
+package com.application.detector;
 
-import com.application.businessLogic.interfaces.DataAnomalyDetector;
+import com.application.detector.interfaces.DataAnomalyDetector;
 import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * A Data Anomaly Detector based on Z-Score test
+ */
 public class ZScoreAnomalyDetector implements DataAnomalyDetector {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -41,6 +44,14 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
     private final double zetaScoreThreshold;
 
     public ZScoreAnomalyDetector(int queueWindowSize, double zetaScoreThreshold) {
+        if (queueWindowSize < 1) {
+            throw new IllegalArgumentException("ZScore Anomaly Detector cannot have Queue Window Size below 1");
+        }
+
+        if (zetaScoreThreshold < 0) {
+            throw new IllegalArgumentException("ZScore Anomaly Detector cannot have Z-Score Threshold below 0");
+        }
+
         this.queueWindowSize = queueWindowSize;
         this.zetaScoreThreshold = zetaScoreThreshold;
     }
@@ -82,6 +93,14 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
         checkIfDataAnomaly(dataPoint);
     }
 
+    /**
+     * Checks the Z-Score of a passed data point.
+     *
+     * The method assumed that the Mean and Standard Deviation
+     * have already been calculated.
+     *
+     * @param dataPoint the data point that will be checked for Z-Score
+     */
     private void checkIfDataAnomaly(double dataPoint) {
         // The Z-Score is calculating by:
         // 1. The absolute value from subtracting the Mean from the new data point
@@ -115,13 +134,19 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
         }
     }
 
+    /**
+     * Performs the calculation to update the Standard Deviation
+     * based on the current values for the data point queue.
+     */
     private void updateStandardDeviation() {
+        // Standard Deviation calculation:
         // 1. Subtract the Mean from each value in the queue;
         // this will find the distance from the mean
         // 2. Find the square (x^2) for each of the 'distances'
         // 3. Sum all values from step 2
         // 4. Divide the sum by the size of the Queue
         // 5. Take the square root
+
         // Copy values to a list to prevent messing with the actual queue
         List<Double> dataPointList = dataPointQueue.stream().toList();
 
@@ -131,7 +156,8 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
                         dp -> Math.pow(dp - this.mean, 2)
                 )
                 .reduce(Double::sum)
-                .get();
+                // return 0.0 if no value is present
+                .orElse(0.0);
 
         this.standardDeviation = Math.sqrt(summedSquaredDistances / dataPointList.size());
     }

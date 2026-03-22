@@ -39,7 +39,8 @@ Check the Docker folder for the docker-compose files and use cases.
 
 Development plans to increment this project:
 
-- Increase unit test coverage to at least 80%. JaCoCo (Java) is enough for simpler maintenance, but should consider SonarQube or similar when adding this application to an enterprise setting. Additionally, unit test coverage % should be added as a requirement for Pull Requests Checks.
+- Increase unit test coverage to at least 80%. JaCoCo (Java) is enough for simpler maintenance, but should consider SonarQube or similar when adding this application to an enterprise setting. Additionally, unit test coverage % should be added as a requirement for Pull Request Checks.
+- Improve credentials security between Consumer and RabbitMQ, so compose files don't need to pass the password in plaintext.
 - Add a Helm Chart file for deployment with Kubernetes (K8S). The structure should support a Vault/Secrets Manager for the Message Broker credentials.
 - Add support to Kafka as Message Broker. Kafka is a market standard for use-cases involving greater data volume (100K+ per second). This addition increases the scope of usages for this project.
 - Define a minimum benchmark target. At this point the project lacks a proper benchmark test and a definitive goal for number of simultaneous queues consumed and throughput. This will provide usage insights, help evaluate the project against real world scenarios, and also help evaluate future roadmap.

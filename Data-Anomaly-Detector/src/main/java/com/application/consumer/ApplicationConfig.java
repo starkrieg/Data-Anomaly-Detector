@@ -14,8 +14,9 @@ public class ApplicationConfig {
     // Field anomaly-threshold
     private double anomalyThreshold;
 
-    public void displayMessage() {
-        System.out.println("Configs: [" + name + "] [" + datasetSize + "] [" + anomalyThreshold + "]");
+    @Override
+    public String toString() {
+        return "Configs: [ Queue=" + name + "] [ DatasetSize=" + datasetSize + "] [ Anomaly Threshold=" + anomalyThreshold + "]";
     }
 
     public String getName() {

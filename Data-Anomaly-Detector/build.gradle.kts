@@ -12,6 +12,9 @@ plugins {
     // with Gradle 8.14+ or 9.x - we use 9.3.1
     // Therefore, we can use Spring 4.0.4
     id("org.springframework.boot").version("4.0.4")
+
+    // JaCoCo for Unit Test coverage
+    id("jacoco")
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -53,6 +56,25 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+jacoco {
+    toolVersion = "0.8.14"
+    // Define where JaCoCo reports will be stored
+    // path /build/reports/jacoco
+    reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
+}
+
 tasks.test {
     useJUnitPlatform()
+    // Always generate JaCoCo report after running tests
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    // Test should always be run before the JaCoCo Test Report
+    dependsOn(tasks.test)
+    reports {
+        csv.required = false;
+        xml.required = false;
+        //html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+    }
 }

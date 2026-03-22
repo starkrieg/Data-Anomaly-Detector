@@ -55,9 +55,9 @@ print(f"Rabbit Host: {args.RabbitHost}")
 print(f"Rabbit Port: {args.RabbitPort}")
 print(f"Rabbit User: {args.RabbitUsername}")
 print(f"Rabbit Pass: ***")
-print(f"Queue Target: {args.targetQueue}")
-print(f"Anomaly Odds: {args.anomalyOdds}")
-print(f"Message Delay: {args.messageDelay}")
+print(f"Queue Target: {args.TargetQueue}")
+print(f"Anomaly Odds: {args.AnomalyOdds}")
+print(f"Message Delay: {args.MessageDelay}")
 
 # Instance of the producer that will continuously send the data points
 producer = RabbitMqProducer(args.TargetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)

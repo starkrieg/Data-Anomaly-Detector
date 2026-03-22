@@ -1,4 +1,4 @@
-package com.application.businessLogic.interfaces;
+package com.application.detector.interfaces;
 
 public interface DataAnomalyDetector {
 

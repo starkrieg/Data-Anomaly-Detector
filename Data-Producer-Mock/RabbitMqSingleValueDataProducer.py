@@ -32,7 +32,7 @@ parser.add_argument("--RabbitPassword",
     default='guest', type=str)
 
 # The -- makes the argument into optional
-parser.add_argument("Value", 
+parser.add_argument("--Value", 
     help="The numeric value that the Producer will send. Supports floating point numbers. Defaults to 2.5", 
     default='2.5', type=float)
 
@@ -40,9 +40,19 @@ args = parser.parse_args()
 
 producer = RabbitMqProducer(args.TargetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)
 
+producer.declareQueue()
+
 value = args.Value
 
-producer.publishToTarget(value)
+print("Starting Continuous Data Producer for RabbitMQ")
+print(f"Rabbit Host: {args.RabbitHost}")
+print(f"Rabbit Port: {args.RabbitPort}")
+print(f"Rabbit User: {args.RabbitUsername}")
+print(f"Rabbit Pass: ***")
+print(f"Queue Target: {args.TargetQueue}")
+print(f"Value: {args.Value}")
+
+producer.publishToTarget(str(value))
 
 print(f" Sent {value}")
 
