@@ -120,8 +120,8 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
 
             if (isAnomaly) {
                 // Log Anomaly
-                logger.warn(String.format("Data Point: %.2f | Status: ANOMALY DETECTED " +
-                        "| Z-score: %.2f | ALERT: Significant deviation detection", dataPoint, zetaScore));
+                logger.warn(String.format("Data Point: %.2f | Status: ANOMALY DETECTED! " +
+                        "| Z-score: %.2f | ALERT: Significant deviation detection.", dataPoint, zetaScore));
             } else {
                 // Log Normal
                 logger.info(String.format("Data Point: %.2f | Status: OK " +

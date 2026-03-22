@@ -1,5 +1,5 @@
 # Run with
-# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-consumer.yml up -d
+# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-consumer.yaml up -d
 
 networks:
   data-anomaly:
@@ -17,8 +17,8 @@ services:
       - 3000:8080
     environment:
       INBOUND_QUEUE: "inbound"
-      DATASET-SIZE: 100
-      ANOMALY-THRESHOLD: 3
+      DATASET_SIZE: 50
+      ANOMALY_THRESHOLD: 3
       RABBITMQ_USER: "guest"
       RABBITMQ_PASS: "guest"
       RABBITMQ_PORT: 5672

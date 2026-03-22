@@ -62,5 +62,7 @@ print(f"Message Delay: {args.MessageDelay}")
 # Instance of the producer that will continuously send the data points
 producer = RabbitMqProducer(args.TargetQueue, args.RabbitHost, args.RabbitPort, args.RabbitUsername, args.RabbitPassword)
 
+producer.declareQueue()
+
 # Producer will run until the thread is killed
 ContinuousProducer.start(producer=producer, odds_of_anomaly=odds_of_anomaly, message_delay=message_delay)

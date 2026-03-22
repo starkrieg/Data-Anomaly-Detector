@@ -43,7 +43,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // For web applications / REST endpoints
-    // implementation("org.springframework.boot:spring-boot-starter-web")
+    // This is also required to enable the actuator endpoints
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     // Spring AMQP eases management of AMQP-based solutions
     // Chosen to facilitate integration with RabbitMQ
@@ -75,6 +76,5 @@ tasks.jacocoTestReport {
     reports {
         csv.required = false;
         xml.required = false;
-        //html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
     }
 }

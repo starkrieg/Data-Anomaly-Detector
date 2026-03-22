@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 management:
   endpoints:
     web:
@@ -7,8 +10,8 @@ management:
 application:
   queue:
     name: ${INBOUND_QUEUE:inbound}
-    dataset-size: ${DATASET-SIZE:50} # between 50 and 100
-    anomaly-threshold: ${ANOMALY-THRESHOLD:3} # threshold to define a data point is an anomaly
+    dataset-size: ${DATASET_SIZE:50} # between 50 and 100
+    anomaly-threshold: ${ANOMALY_THRESHOLD:3} # threshold to define a data point is an anomaly
 
 logging:
   pattern:
@@ -33,11 +36,3 @@ spring:
     password: ${RABBITMQ_PASS:guest}
     port: ${RABBITMQ_PORT:5672}
     host: ${RABBITMQ_HOST:localhost}
-    listener:
-      simple:
-        retry:
-          enabled: false
-          initial-interval: 2000
-          multiplier: 1.5
-          max-interval: 10000
-          max-attempts: 3

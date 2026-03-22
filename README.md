@@ -12,7 +12,20 @@ Currently supported behavior:
 
 This monorepo also includes files for the supported message brokers, and a Python-based Data Producer to mock data generation.
 
+When adding changes, utilize Pull Requests instead of pushing directly to `develop`. 
+Existing GitHub actions support this workflow by running a build check on the Data-Anomaly-Detector app.
+
 Note: Currently does NOT support Horizontal Scaling; multiple instances will NOT coordinate with one another.
+
+## Stack
+
+| Tech | Version | Info |
+|---|---|---|
+| Java | 25 | Anomaly Detector Consumer |
+| Gradle | 9.3.1 | Anomaly Detector Consumer |
+| Spring | 4.0.4 | Anomaly Detector Consumer |
+| Python | 3.12.10 | Mock Data Producer |
+
 
 ## RabbitMQ as Message Broker
 
@@ -27,7 +40,7 @@ Redis Pub/Sub was considered, but it's message broker structure is more similar 
 
 ## Mock Data Producer 
 
-A Mock Data Producer written in Python. Continuously produces data to a target queue.
+A Mock Data Producer written in Python. Continuously produces data to a target queue following a normal distribution, with eventual anomalous data points.
 
 More details on the Data Producer Mock folder.
 
@@ -35,16 +48,20 @@ More details on the Data Producer Mock folder.
 
 Check the Docker folder for the docker-compose files and use cases.
 
+Check the Chart folder for the Helm Chart files.
+
 ## Up Next
 
 Development plans to increment this project:
 
-- Increase unit test coverage to at least 80%. JaCoCo (Java) is enough for simpler maintenance, but should consider SonarQube or similar when adding this application to an enterprise setting. Additionally, unit test coverage % should be added as a requirement for Pull Request Checks.
+- Increase unit test coverage to at least 80%. JaCoCo (Java) has been added to facilitate tracking.
+- Consider adding SonarQube or similar when adding this application to an enterprise setting. 
+- Unit test coverage % should be added as a Pull Request Check, eventually becoming a blocking check.
 - Improve credentials security between Consumer and RabbitMQ, so compose files don't need to pass the password in plaintext.
-- Add a Helm Chart file for deployment with Kubernetes (K8S). The structure should support a Vault/Secrets Manager for the Message Broker credentials.
+- Improve Helm Chart files to add link to secrets manager and vault structures, to replace direct usage of Message Broker Credentials.
 - Add support to Kafka as Message Broker. Kafka is a market standard for use-cases involving greater data volume (100K+ per second). This addition increases the scope of usages for this project.
-- Define a minimum benchmark target. At this point the project lacks a proper benchmark test and a definitive goal for number of simultaneous queues consumed and throughput. This will provide usage insights, help evaluate the project against real world scenarios, and also help evaluate future roadmap.
-- Evaluate adding other data anomaly detection algorithms to increase use-cases supported.
-- Restrict commits to `develop` branch and require Pull Requests for proper code review on changes.
-- Add PR checks through GitHub Actions, such as builds with no errors and code coverage.
+- The project is missing a Performance Baseline: target throughput, memory footprint, if it should support multiple queues at the same time, etc. This will provide usage insights, help evaluate the project against real world scenarios, and also help evaluate future roadmap.
+- Add support for other data anomaly detection algorithms.
+- Restrict commits to `develop` branch; make Pull Requests mandatory, and make existing PR Actions as required to be passing.
+- Add more comprehensive GitHub Actions to test behavior and quality of Data Consumer and Producer.
 - Add GitHub Action trigger on Release to push a new tag to a Container Registry.
