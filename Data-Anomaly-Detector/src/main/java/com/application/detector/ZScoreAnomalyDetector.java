@@ -3,7 +3,6 @@ package com.application.detector;
 import com.application.detector.interfaces.DataAnomalyDetector;
 import org.slf4j.Logger;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -23,16 +22,14 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
     // Define the max window size for the queue
     private final int queueWindowSize;
 
-    // Keep a sum of the data points in the queue
-    // Add to it when a new data point is added
-    // Subtract when a data point leaves the window
-    // With this, there is no need to sum all queue numbers every time there is need to recalculate the mean
-    private double queueSum;
-
     // Mean value for all values inside the queue
     // The Mean is the sum of all numbers in a list, divided by the size of the list
     // Recalculated every time a new data point is added/removed
     private double mean;
+
+    // The square of the current mean
+    // To be used with Welford's Variance Algorithm to calculate standard deviation as one-pass
+    private double meanSquared;
 
     // Standard deviation for the values inside the queue
     // Recalculated every time a new data point is added/removed
@@ -42,6 +39,9 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
     // New data points will have their own Z-Score calculated based on the updated Mean and Standard Deviation
     // If their Z-Score is above this threshold, the data point will be considered an Anomaly
     private final double zetaScoreThreshold;
+
+    // The last Z-Score calculated for the last data point added
+    private double lastZScore;
 
     public ZScoreAnomalyDetector(int queueWindowSize, double zetaScoreThreshold) {
         if (queueWindowSize < 1) {
@@ -72,19 +72,27 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
         // Then remove the oldest data point to add the new now
         if (this.dataPointQueue.size() >= this.queueWindowSize) {
             Double oldestPoint = this.dataPointQueue.remove();
-            // Remove oldest value from sum
-            this.queueSum -= oldestPoint;
+            // The passage below is based on the Welford's Variance algorithm for one-pass subtraction
+            // of a datapoint
+            // Refer to https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
+            double oldMean = this.mean;
+            this.mean -= Double.sum(oldestPoint, - this.mean) / this.dataPointQueue.size();
+            this.meanSquared -= Double.sum(oldestPoint, - oldMean) * Double.sum(oldestPoint, - this.mean);
+            //
         }
 
         // Add newest data point
         this.dataPointQueue.add(dataPoint);
-        this.queueSum += dataPoint; // Add newest value
 
-        // Update mean
-        this.mean = this.queueSum / this.dataPointQueue.size();
-
-        // TODO - Check if Standard Deviation and Z-Score Analysis can be done outside the synchronized block
-        // since these calculations might take longer
+        // Calculate new mean and mean squared
+        int size = this.dataPointQueue.size();
+        // The passage below is based on the Welford's Variance algorithm for one-pass addition
+        // of a datapoint
+        // Refer to https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
+        double oldMean = this.mean;
+        this.mean += Double.sum(dataPoint, - this.mean) / size;
+        this.meanSquared += Double.sum(dataPoint, - oldMean) * Double.sum(dataPoint, - this.mean);
+        //
 
         // Update standard deviation
         updateStandardDeviation();
@@ -110,8 +118,11 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
         // The Z-Score cannot be calculated because it's a division by 0
         // In this case, default a Z-Score of 0
 
-        if (this.standardDeviation > 0) {
+        if (this.standardDeviation > 0.0) {
             double zetaScore = Math.abs(dataPoint - this.mean) / this.standardDeviation;
+
+            // Update last Z-Score calculated
+            this.lastZScore = zetaScore;
 
             // Z-Score test then evaluates the zetaScore for the new data point
             // against a Z-Score threshold
@@ -147,19 +158,35 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
         // 4. Divide the sum by the size of the Queue
         // 5. Take the square root
 
-        // Copy values to a list to prevent messing with the actual queue
-        List<Double> dataPointList = dataPointQueue.stream().toList();
+        // 2025-Apr-01
+        // Standard deviation formula can be read as below:
+        // Sqrt( ( (Xi - Mean)^2 + (Xii - Mean)^2 + ... ) / queueSize )
+        //
+        // Through many simplification steps, the formula can be reduced to this:
+        // Sqrt( ( queueSumOfSquares/queueSize - (Mean^2) )
+        //
+        // However, this simplified formula MUST NEVER be used
+        // Read this link wikipedia page to understand the issues with the Naive approach
+        // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Na%C3%AFve_algorithm
+        //
+        // Instead, let's use the Welford's Varianve Algorithm for a more stable calculation while keeping the one-pass goal
+        // https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
 
-        var summedSquaredDistances = dataPointList.stream()
-                .map(
-                        // Find the 'distance' and square it for each data point
-                        dp -> Math.pow(dp - this.mean, 2)
-                )
-                .reduce(Double::sum)
-                // return 0.0 if no value is present
-                .orElse(0.0);
-
-        this.standardDeviation = Math.sqrt(summedSquaredDistances / dataPointList.size());
+        // Addition and subtraction of mean and meanSquared are done in a previous method
+        // Regular Welford Variance results in a squared variance
+        // So we add the Sqrt to get the simple variance
+        this.standardDeviation = Math.sqrt(this.meanSquared / this.dataPointQueue.size());
     }
 
+    public double getMean() {
+        return mean;
+    }
+
+    public double getStandardDeviation() {
+        return standardDeviation;
+    }
+
+    public double getLastZScore() {
+        return lastZScore;
+    }
 }
