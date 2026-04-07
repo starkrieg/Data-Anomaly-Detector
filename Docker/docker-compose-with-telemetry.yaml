@@ -1,0 +1,76 @@
+# Run with
+# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-with-telemetry.yaml up -d
+
+networks:
+  data-anomaly:
+
+services:
+  rabbitmq:
+    networks:
+      - data-anomaly
+    container_name: rabbitmq
+    # RabbitMQ
+    # https://hub.docker.com/layers/library/rabbitmq/4.2.5-management-alpine/images/sha256-236bb5ddf99476e9856e3ecc157c81bc8666379c4bc85253af42996f0bae74e3
+    image: rabbitmq:4.2.5-management-alpine@sha256:7983ce30209cb12a4423907cfafe9eebcfa3dfc8e7463a444b1070bf0f52851c
+    restart: always
+    ports:
+      # outside:inside
+      - 5672:5672 # For app connection via AMQP
+      - 15672:15672 # For access to the management UI
+    environment:
+      # username and pass default to guest/guest
+      username: "guest"
+      password: "guest"
+
+
+  data-anomaly-detector:
+    networks:
+      - data-anomaly
+    image: data-anomaly-detector:latest
+    # Make sure file 'prometheus.yml' has the correct target for the anomaly-detector
+    container_name: anomaly-detector
+    restart: always
+    depends_on:
+      - rabbitmq
+    environment:
+      INBOUND_QUEUE: "inbound"
+      DATASET_SIZE: 50
+      ANOMALY_THRESHOLD: 3
+      RABBITMQ_USER: "guest"
+      RABBITMQ_PASS: "guest"
+      RABBITMQ_PORT: 5672
+      RABBITMQ_HOST: rabbitmq
+      
+  data-producer:
+    networks:
+      - data-anomaly
+    image: data-producer-mock:latest
+    container_name: data-producer
+    depends_on:
+      - rabbitmq
+    # add args directly to command like here
+    # args are:
+    # --anomalyOdds ANOMALY_ODDS
+    # --targetQueue TARGET_QUEUE
+    # --messageDelay MESSAGE_DELAY
+    # --RabbitHost RABBITMQ_HOST
+    # --RabbitPort RABBITMQ_PORT
+    # --RabbitUsername RABBITMQ_USER
+    # --RabbitPassword RABBITMQ_PASS
+    command: "--RabbitHost rabbitmq"
+            
+  # Prometheus is a systems and service monitoring system
+  # Here its used to poll metrics from the Anomaly Detector app
+  prometheus:
+    networks:
+      - data-anomaly
+    # ubuntu/prometheus is distributed by Canonical
+    image: ubuntu/prometheus:3-24.04_stable
+    container_name: prometheus
+    restart: always
+    ports:
+      - 9090:9090 # this will expose a UI for Prometheus
+    volumes:
+      # Read only access to the prometheus settings
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+

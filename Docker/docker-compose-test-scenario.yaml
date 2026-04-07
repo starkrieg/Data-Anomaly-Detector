@@ -1,5 +1,5 @@
 # Run with
-# docker-compose -p data-anomaly-detector-full -f .\Docker\docker-compose-full-scenario.yaml up -d
+# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-test-scenario.yaml up -d
 
 networks:
   data-anomaly:
@@ -34,7 +34,6 @@ services:
     # expose the ports to connect from outside docker env
     ports:
       # outside:inside
-      - 3000:8080
     environment:
       INBOUND_QUEUE: "inbound"
       DATASET_SIZE: 50
@@ -76,4 +75,3 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
         
-
