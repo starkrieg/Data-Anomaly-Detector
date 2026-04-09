@@ -1,8 +1,8 @@
 ## Compose files to support various use cases
 
-### Full Scenario
+### Test Scenario
 
-Deploy a complete set of apps for full use-case scenario. Use it to test RabbitMQ configs, change Data Producer settings, and test Consumer algorithm and behavior.
+Deploy a complete set of apps to test use-case scenario. Use it to test RabbitMQ configs, change Data Producer settings, and test Consumer algorithm behavior.
 
 Includes:
 - RabbitMQ on port 5672 and admin console on 15672, default user/pass are guest/guest
@@ -10,13 +10,17 @@ Includes:
 - Consumer application, all included.
 - Dozzle (https://dozzle.dev/) for simple monitoring of the containers and their logs, very useful to track both data being Produced and Consumed at the same time.
 
+### Telemetry Scenario
 
-### Consumer with RabbitMQ
+Deploy Prometheus + Grafana instead of Dozzle and visualize telemetry data for the Consumer application.
+
+The dashboard `JVM (Micrometer) (4701)` is provisioned to Grafana out-of-the-box.
+
+### Just Consumer with RabbitMQ
 
 Deploy just a RabbitMQ and the Consumer app. Then just plug any data producer app you want, from wherever you want.
 
 The compose also includes a Dozzle instance for easier monitoring of this stack.
-
 
 ### Just Consumer
 
