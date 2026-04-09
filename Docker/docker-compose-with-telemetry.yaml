@@ -50,9 +50,9 @@ services:
       - data-anomaly-detector
     # add args directly to command like here
     # args are:
-    # --anomalyOdds ANOMALY_ODDS
-    # --targetQueue TARGET_QUEUE
-    # --messageDelay MESSAGE_DELAY
+    # --AnomalyOdds ANOMALY_ODDS
+    # --TargetQueue TARGET_QUEUE
+    # --MessageDelay MESSAGE_DELAY
     # --RabbitHost RABBITMQ_HOST
     # --RabbitPort RABBITMQ_PORT
     # --RabbitUsername RABBITMQ_USER

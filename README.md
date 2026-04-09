@@ -9,11 +9,12 @@ Currently supported behavior:
 - A rolling window of the N most recent data points is kept.
 - The rolling window of N data points is used to calculate the Mean, Standard Deviation, and Anomaly Detection using the Z-score test (https://en.wikipedia.org/wiki/Z-test).
 - Data points consumed are logged as either Normal or Anomaly, with anomalies logged as Warning.
+- Telemetry data exposed on endpoint `/actuator/prometheus` for usage with Prometheus.
 
 This monorepo also includes files for the supported message brokers, and a Python-based Data Producer to mock data generation.
 
 When adding changes, utilize Pull Requests instead of pushing directly to `develop`. 
-Existing GitHub actions support this workflow by running a build check on the Data-Anomaly-Detector app.
+A GitHub action will run a build check on the Data-Anomaly-Detector app on all Pull Requests.
 
 Note: Currently does NOT support Horizontal Scaling; multiple instances will NOT coordinate with one another.
 
@@ -24,6 +25,7 @@ Note: Currently does NOT support Horizontal Scaling; multiple instances will NOT
 | Java | 25 | Anomaly Detector Consumer |
 | Gradle | 9.3.1 | Anomaly Detector Consumer |
 | Spring | 4.0.4 | Anomaly Detector Consumer |
+| Micrometer | 1.16.4 | Prometheus telemetry for Anomaly Detector Consumer |
 | Python | 3.12.10 | Mock Data Producer |
 
 
@@ -34,9 +36,7 @@ RabbitMQ is a lightweight message broker that is well known in the market. Key p
 - Uses a queue system with acknowledgement for messages, which provides greater reliability
 - Lightweight
 
-
 Redis Pub/Sub was considered, but it's message broker structure is more similar to broadcasting, meaning there is a chance messages can be lost.
-
 
 ## Mock Data Producer 
 
