@@ -47,7 +47,7 @@ services:
     image: data-producer-mock:latest
     container_name: data-producer
     depends_on:
-      - rabbitmq
+      - data-anomaly-detector
     # add args directly to command like here
     # args are:
     # --anomalyOdds ANOMALY_ODDS
@@ -65,12 +65,33 @@ services:
     networks:
       - data-anomaly
     # ubuntu/prometheus is distributed by Canonical
-    image: ubuntu/prometheus:3-24.04_stable
+    image: ubuntu/prometheus:3-24.04_stable@sha256:cb35487eea300a57e42423d8d88223021606363f41ba6976214338b1b3a84f3d
     container_name: prometheus
+    depends_on:
+      - data-anomaly-detector
     restart: always
     ports:
       - 9090:9090 # this will expose a UI for Prometheus
     volumes:
       # Read only access to the prometheus settings
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  # Grafana enables you to query, visualize, alert on, and explore your metrics, logs, and traces wherever they’re stored
+  # Here we are using it to visualize the data collected by Prometheus
+  grafana:
+    networks:
+      - data-anomaly
+    # 
+    image: grafana/grafana:13.0.0-24111282511@sha256:5fa725952312feaec36b6ca52aa4adfeb65ad68404a2dfad3bcd4c13a054532b
+    container_name: grafana
+    restart: always
+    ports:
+      # default credentials are admin/admin
+      - 3000:3000
+    volumes:
+      # provision a Prometheus datasource config out of the box
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      # provision a JVM Micrometer dashboard (ID 4701) out of the box
+      # https://grafana.com/grafana/dashboards/4701-jvm-micrometer/
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
 

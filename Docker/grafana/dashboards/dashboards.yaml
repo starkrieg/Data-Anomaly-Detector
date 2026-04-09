@@ -1,0 +1,11 @@
+apiVersion: 1
+# This file is required so Grafana will know where to find the provisioned dashboards
+providers:
+  - name: 'Default'               # Unique provider name
+    orgId: 1
+    folder: 'Provisioned'        # Folder name in Grafana UI
+    type: file
+    disableDeletion: false       # Allow/disallow UI deletion
+    editable: true               # Allow/disallow UI editing
+    options:
+      path: /etc/grafana/provisioning/dashboards  # Path inside container
