@@ -42,6 +42,10 @@ dependencies {
     // Adds actuator endpoints, such as health and info
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // Micrometer library is required for Spring actuator to expose Prometheus endpoint
+    // Source: https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+    implementation("io.micrometer:micrometer-registry-prometheus:1.16.4")
+
     // For web applications / REST endpoints
     // This is also required to enable the actuator endpoints
     implementation("org.springframework.boot:spring-boot-starter-web")

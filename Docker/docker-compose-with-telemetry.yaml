@@ -1,5 +1,5 @@
 # Run with
-# docker-compose -p data-anomaly-detector-full -f .\Docker\docker-compose-full-scenario.yaml up -d
+# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-with-telemetry.yaml up -d
 
 networks:
   data-anomaly:
@@ -27,14 +27,11 @@ services:
     networks:
       - data-anomaly
     image: data-anomaly-detector:latest
+    # Make sure file 'prometheus.yml' has the correct target for the anomaly-detector
     container_name: anomaly-detector
     restart: always
     depends_on:
       - rabbitmq
-    # expose the ports to connect from outside docker env
-    ports:
-      # outside:inside
-      - 3000:8080
     environment:
       INBOUND_QUEUE: "inbound"
       DATASET_SIZE: 50
@@ -50,7 +47,7 @@ services:
     image: data-producer-mock:latest
     container_name: data-producer
     depends_on:
-      - rabbitmq
+      - data-anomaly-detector
     # add args directly to command like here
     # args are:
     # --anomalyOdds ANOMALY_ODDS
@@ -61,19 +58,40 @@ services:
     # --RabbitUsername RABBITMQ_USER
     # --RabbitPassword RABBITMQ_PASS
     command: "--RabbitHost rabbitmq"
-    
-  # Dozzle (https://dozzle.dev/) added to facilitate log monitoring of apps without needing Docker desktop
-  # Especially to allow easier monitoring of both Producer and Consumer apps
-  dozzle:
+            
+  # Prometheus is a systems and service monitoring system
+  # Here its used to poll metrics from the Anomaly Detector app
+  prometheus:
     networks:
       - data-anomaly
-    image: amir20/dozzle:v10.0.5
-    container_name: dozzle
+    # ubuntu/prometheus is distributed by Canonical
+    image: ubuntu/prometheus:3-24.04_stable@sha256:cb35487eea300a57e42423d8d88223021606363f41ba6976214338b1b3a84f3d
+    container_name: prometheus
+    depends_on:
+      - data-anomaly-detector
     restart: always
     ports:
-      - 7010:8080
-    # make sure volume is readonly
+      - 9090:9090 # this will expose a UI for Prometheus
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-        
+      # Read only access to the prometheus settings
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  # Grafana enables you to query, visualize, alert on, and explore your metrics, logs, and traces wherever they’re stored
+  # Here we are using it to visualize the data collected by Prometheus
+  grafana:
+    networks:
+      - data-anomaly
+    # 
+    image: grafana/grafana:13.0.0-24111282511@sha256:5fa725952312feaec36b6ca52aa4adfeb65ad68404a2dfad3bcd4c13a054532b
+    container_name: grafana
+    restart: always
+    ports:
+      # default credentials are admin/admin
+      - 3000:3000
+    volumes:
+      # provision a Prometheus datasource config out of the box
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      # provision a JVM Micrometer dashboard (ID 4701) out of the box
+      # https://grafana.com/grafana/dashboards/4701-jvm-micrometer/
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
 

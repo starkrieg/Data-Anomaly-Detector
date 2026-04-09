@@ -1,6 +1,5 @@
-
 # Run with
-# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-with-rabbitmq.yaml up -d
+# docker-compose -p data-anomaly-detector -f .\Docker\docker-compose-test-scenario.yaml up -d
 
 networks:
   data-anomaly:
@@ -30,10 +29,11 @@ services:
     image: data-anomaly-detector:latest
     container_name: anomaly-detector
     restart: always
+    depends_on:
+      - rabbitmq
     # expose the ports to connect from outside docker env
     ports:
       # outside:inside
-      - 3000:8080
     environment:
       INBOUND_QUEUE: "inbound"
       DATASET_SIZE: 50
@@ -42,8 +42,27 @@ services:
       RABBITMQ_PASS: "guest"
       RABBITMQ_PORT: 5672
       RABBITMQ_HOST: rabbitmq
-
+      
+  data-producer:
+    networks:
+      - data-anomaly
+    image: data-producer-mock:latest
+    container_name: data-producer
+    depends_on:
+      - rabbitmq
+    # add args directly to command like here
+    # args are:
+    # --anomalyOdds ANOMALY_ODDS
+    # --targetQueue TARGET_QUEUE
+    # --messageDelay MESSAGE_DELAY
+    # --RabbitHost RABBITMQ_HOST
+    # --RabbitPort RABBITMQ_PORT
+    # --RabbitUsername RABBITMQ_USER
+    # --RabbitPassword RABBITMQ_PASS
+    command: "--RabbitHost rabbitmq"
+    
   # Dozzle (https://dozzle.dev/) added to facilitate log monitoring of apps without needing Docker desktop
+  # Especially to allow easier monitoring of both Producer and Consumer apps
   dozzle:
     networks:
       - data-anomaly
@@ -55,3 +74,4 @@ services:
     # make sure volume is readonly
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+        

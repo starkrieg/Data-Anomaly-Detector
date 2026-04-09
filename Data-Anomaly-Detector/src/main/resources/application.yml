@@ -2,10 +2,14 @@ server:
   port: 8080
 
 management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      instance: ${HOSTNAME:default}
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, prometheus
 
 application:
   queue:
