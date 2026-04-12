@@ -21,13 +21,17 @@ public class RabbitMqConsumer implements Consumer {
     @Autowired
     private ApplicationConfig applicationConfig;
 
-    private final DataAnomalyDetector dataAnomalyDetector;
-
+    /*
+        Anomaly Detector has Scope Prototype,
+        meaning a new instance will be created for every new RabbitMqConsumer
+    */
     @Autowired
-    public RabbitMqConsumer(ApplicationConfig applicationConfig) {
-        logger.info(applicationConfig.toString());
-        dataAnomalyDetector = new ZScoreAnomalyDetector(applicationConfig.getDatasetSize(),
-                applicationConfig.getAnomalyThreshold());
+    private DataAnomalyDetector dataAnomalyDetector;
+
+    public RabbitMqConsumer(ApplicationConfig applicationConfig, DataAnomalyDetector dataAnomalyDetector) {
+        logger.warn(applicationConfig.toString());
+        this.applicationConfig = applicationConfig;
+        this.dataAnomalyDetector = dataAnomalyDetector;
     }
 
     /**

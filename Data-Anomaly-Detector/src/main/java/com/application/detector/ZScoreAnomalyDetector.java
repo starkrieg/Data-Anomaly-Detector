@@ -1,13 +1,19 @@
 package com.application.detector;
 
+import com.application.consumer.ApplicationConfig;
 import com.application.detector.interfaces.DataAnomalyDetector;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * A Data Anomaly Detector based on Z-Score test
  */
+@Component
 public class ZScoreAnomalyDetector implements DataAnomalyDetector {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -43,7 +49,11 @@ public class ZScoreAnomalyDetector implements DataAnomalyDetector {
     // The last Z-Score calculated for the last data point added
     private double lastZScore;
 
-    public ZScoreAnomalyDetector(int queueWindowSize, double zetaScoreThreshold) {
+    @Autowired
+    public ZScoreAnomalyDetector(ApplicationConfig applicationConfig) {
+        int queueWindowSize = applicationConfig.getDatasetSize();
+        double zetaScoreThreshold = applicationConfig.getAnomalyThreshold();
+
         if (queueWindowSize < 1) {
             throw new IllegalArgumentException("ZScore Anomaly Detector cannot have Queue Window Size below 1");
         }
