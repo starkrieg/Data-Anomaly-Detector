@@ -1,14 +1,40 @@
 package com.application.detector;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.application.consumer.ApplicationConfig;
+import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 public class ZScoreAnomalyDetectorTest {
+
+    @Mock
+    public ApplicationConfig mockApplicationConfig;
+
+    @BeforeEach
+    public void beforeEach() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    public void afterEach() throws Exception {
+        MockitoAnnotations.openMocks(this).close();
+    }
 
     @Test
     public void testConstructorWithWindowBelowOne_Fail() {
         try {
-            ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(0, 3.5);
+            // prepare
+            int datasetSize = 0;
+            double anomalyThreshold = 3.5;
+
+            Mockito.when(mockApplicationConfig.getDatasetSize()).thenReturn(datasetSize);
+            Mockito.when(mockApplicationConfig.getAnomalyThreshold()).thenReturn(anomalyThreshold);
+
+            // test
+            ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(mockApplicationConfig);
+
+            // then
             Assertions.fail("Expected exception when creating object with invalid args");
         } catch (IllegalArgumentException ex) {
             Assertions.assertTrue(true);
@@ -20,7 +46,17 @@ public class ZScoreAnomalyDetectorTest {
     @Test
     public void testConstructorWithThresholdBelowZero_Fail() {
         try {
-            ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(50, -1.5);
+            // prepare
+            int datasetSize = 50;
+            double anomalyThreshold = -1.5;
+
+            Mockito.when(mockApplicationConfig.getDatasetSize()).thenReturn(datasetSize);
+            Mockito.when(mockApplicationConfig.getAnomalyThreshold()).thenReturn(anomalyThreshold);
+
+            // test
+            ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(mockApplicationConfig);
+
+            // then
             Assertions.fail("Expected exception when creating object with invalid args");
         } catch (IllegalArgumentException ex) {
             Assertions.assertTrue(true);
@@ -32,7 +68,17 @@ public class ZScoreAnomalyDetectorTest {
     @Test
     public void testConstructorWithValidValues_Success() {
         try {
-            ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(50, 3.5);
+            // prepare
+            int datasetSize = 50;
+            double anomalyThreshold = 3.5;
+
+            Mockito.when(mockApplicationConfig.getDatasetSize()).thenReturn(datasetSize);
+            Mockito.when(mockApplicationConfig.getAnomalyThreshold()).thenReturn(anomalyThreshold);
+
+            // test
+            ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(mockApplicationConfig);
+
+            // then
             Assertions.assertTrue(true);
         } catch (Exception ex) {
             Assertions.fail("Expected no errors when creating object with valid args");
@@ -41,11 +87,12 @@ public class ZScoreAnomalyDetectorTest {
 
     @Test
     public void testZScoreCalculation_Success() {
+        // prepare
         int datasetSize = 50;
         double zetaScoreThreshold = 3.5;
 
-        // Instance of the class that will be tested
-        ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(datasetSize, zetaScoreThreshold);
+        Mockito.when(mockApplicationConfig.getDatasetSize()).thenReturn(datasetSize);
+        Mockito.when(mockApplicationConfig.getAnomalyThreshold()).thenReturn(zetaScoreThreshold);
 
         // An instance of a Naive implementation of the tested class
         // Used to validate the outputs of the tested class
@@ -69,6 +116,13 @@ public class ZScoreAnomalyDetectorTest {
                 ,-1.60                ,-0.25                ,0.22                ,-0.13                ,0.04
                 ,-1.26                ,-1.54
         };
+
+        // test
+
+        // Instance of the class that will be tested
+        ZScoreAnomalyDetector zScoreAnomalyDetector = new ZScoreAnomalyDetector(mockApplicationConfig);
+
+        // then
 
         // Confirm that we are using a big enough array of data points
         Assertions.assertTrue(values.length > datasetSize, "Array of data points is not big enough");
