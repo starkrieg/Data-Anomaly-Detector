@@ -1,7 +1,6 @@
 package com.application.consumer;
 
 import com.application.consumer.interfaces.Consumer;
-import com.application.detector.ZScoreAnomalyDetector;
 import com.application.detector.interfaces.DataAnomalyDetector;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.Queue;
